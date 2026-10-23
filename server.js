@@ -6,6 +6,7 @@ const path = require("path");
 const os = require("os");
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
 const CONFIG_DIR = process.env.XDG_CONFIG_HOME
     ? path.join(process.env.XDG_CONFIG_HOME, "yasprs")
@@ -37,6 +38,8 @@ function formatSize(bytes) {
 }
 
 function getLocalIP() {
+    // inside a container the detected IP isn't reachable from the PS4
+    if (process.env.HOST_IP) return process.env.HOST_IP;
     const interfaces = os.networkInterfaces();
     for (const iface of Object.values(interfaces)) {
         for (const alias of iface) {
@@ -116,7 +119,7 @@ app.get("/api/pkgs", (req, res) => {
 
 app.get("/api/network", (req, res) => {
     const interfaces = os.networkInterfaces();
-    const ips = [];
+    const ips = process.env.HOST_IP ? [process.env.HOST_IP] : [];
     for (const iface of Object.values(interfaces)) {
         for (const alias of iface) {
             if (alias.family === "IPv4" && !alias.internal) {
@@ -124,7 +127,7 @@ app.get("/api/network", (req, res) => {
             }
         }
     }
-    res.json({ ips });
+    res.json({ ips, port: PORT });
 });
 
 app.post("/api/send", async (req, res) => {
@@ -144,9 +147,8 @@ app.post("/api/send", async (req, res) => {
     }
 
     const serverIP = getLocalIP();
-    const serverPort = process.env.PORT || 3001;
     const fileKey = encodeURIComponent(path.basename(pkgPath));
-    const pkgUrl = `http://${serverIP}:${serverPort}/pkg-files/${fileKey}`;
+    const pkgUrl = `http://${serverIP}:${PORT}/pkg-files/${fileKey}`;
     const ps4Url = `http://${config.ps4ip}:12800/api/install`;
 
     try {
@@ -181,7 +183,6 @@ app.get("/pkg-files/:filename", (req, res) => {
     res.sendFile(filePath);
 });
 
-const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(
         `\nPS4 PKG Sender Web UI running at http://localhost:${PORT}\n`,

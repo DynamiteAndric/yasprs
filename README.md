@@ -47,6 +47,20 @@ Config is stored at:
 - `$XDG_CONFIG_HOME/yasprs/profile.json` (if `XDG_CONFIG_HOME` is set)
 - `~/.config/yasprs/profile.json` (otherwise)
 
+## Docker
+
+```bash
+cp .env.example .env   # then edit HOST_IP and PKG_DIR
+docker compose up -d --build
+```
+
+- `HOST_IP` — LAN IP of the machine running Docker. Required, because the container cannot detect an address the PS4 can reach.
+- `PKG_DIR` — host folder with your `.pkg` files, mounted read-only at `/pkgs`. In **Settings**, set **PKG Base Path** to `/pkgs`.
+- `PORT` — web UI / download port (default `3001`).
+- `PUID` / `PGID` — user and group IDs the app runs as (default `1000`). Set them to the owner of `PKG_DIR` (see `ls -ln`) so the container can read your packages.
+
+Config is kept in the `yasprs-config` Docker volume.
+
 ## Usage
 
 1. Go to **Packages**

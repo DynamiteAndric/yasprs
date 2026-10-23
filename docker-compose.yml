@@ -1,0 +1,23 @@
+services:
+  yasprs:
+    build: .
+    image: yasprs:latest
+    container_name: yasprs
+    restart: unless-stopped
+    ports:
+      # host and container port must match: the PS4 download URL uses PORT
+      - "${PORT:-3001}:${PORT:-3001}"
+    environment:
+      PORT: ${PORT:-3001}
+      # user/group the app runs as; must be able to read PKG_DIR
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      # LAN IP of the Docker host, used in the URL the PS4 downloads from
+      HOST_IP: ${HOST_IP:?Set HOST_IP to this machine's LAN IP (e.g. in .env)}
+    volumes:
+      - yasprs-config:/config
+      # folder with your .pkg files; set "PKG Base Path" to /pkgs in Settings
+      - ${PKG_DIR:?Set PKG_DIR to the folder containing your .pkg files}:/pkgs:ro
+
+volumes:
+  yasprs-config:

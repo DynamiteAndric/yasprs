@@ -32,7 +32,7 @@ export async function loadNetworkIPs() {
         ? ips.map((ip) => `<span class="ip-chip">${ip}</span>`).join("")
         : '<span style="font-size:12px;color:var(--sub)">None found</span>';
 
-    document.getElementById("server-info").textContent = ips[0]
-        ? `${ips[0]}:3001`
-        : "localhost:3001";
+    const port = d.port || location.port || 3001;
+    document.getElementById("server-info").textContent =
+        `${ips[0] || "localhost"}:${port}`;
 }
