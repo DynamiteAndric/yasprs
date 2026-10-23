@@ -2,6 +2,8 @@
 
 **Yet Another Simple PS4 Package Remote Sender**
 
+[This fork tries to dockerize the original app] 
+
 ![packages tab](docs/screenshot_20260228_224720.png)
 
 Send `.pkg` files to your PS4 over your local network via a web UI.
